@@ -204,6 +204,7 @@ namespace OpenRCT2::Ui::Windows
         WIDX_VEHICLE_TERTIARY_COLOUR,
         WIDX_SELL_ITEM_RANDOM_COLOUR_CHECKBOX,
         WIDX_RANDOMISE_VEHICLE_COLOURS,
+        WIDX_RANDOMISE_TRACK_COLOURS,
 
         WIDX_PLAY_MUSIC = 14,
         WIDX_MUSIC,
@@ -346,6 +347,7 @@ namespace OpenRCT2::Ui::Windows
         MakeWidget({119, 190}, { 12, 12}, WindowWidgetType::ColourBtn, WindowColour::Secondary, 0xFFFFFFFF,          STR_SELECT_ADDITIONAL_COLOUR_2_TIP           ),
         MakeWidget({100,  74}, {239, 12}, WindowWidgetType::Checkbox,  WindowColour::Secondary, STR_RANDOM_COLOUR                                                 ),
         MakeWidget({139, 190}, {110, 12}, WindowWidgetType::Button,    WindowColour::Secondary, STR_RANDOMISE_VEHICLE_COLOURS, STR_RANDOMISE_VEHICLE_COLOURS_TIP  ),
+        MakeWidget({139,  74}, {110, 12}, WindowWidgetType::Button,    WindowColour::Secondary, STR_RANDOMISE_TRACK_COLOURS, STR_RANDOMISE_TRACK_COLOURS_TIP  ),
     };
 
     // 0x009AE4C8
@@ -4237,6 +4239,54 @@ namespace OpenRCT2::Ui::Windows
                     }
                     break;
                 }
+                case WIDX_RANDOMISE_TRACK_COLOURS:
+                {
+                    
+                    LOG_ERROR("WIDX_RANDOMISE_TRACK_COLOURS");
+
+
+                    auto ride = GetRide(rideId);
+                    if (ride == nullptr)
+                        return;
+
+                    auto rideEntry = ride->getRideEntry();
+                    if (rideEntry == nullptr)
+                        return;
+
+
+
+
+
+
+                    // switch between color pallet 0-3
+                    auto colorpalet = 0;
+
+
+                    // change color
+                    colour_t colour = UtilRand() % kColourNumNormal;
+                    auto trackSetMainColourAction = RideSetAppearanceAction(
+                        rideId, RideSetAppearanceType::TrackColourMain, colour, colorpalet);
+                    GameActions::Execute(&trackSetMainColourAction);
+
+                    colour = UtilRand() % kColourNumNormal;
+                    auto trackSetAdditionalColourAction = RideSetAppearanceAction(
+                        rideId, RideSetAppearanceType::TrackColourAdditional, colour, colorpalet);
+                    GameActions::Execute(&trackSetAdditionalColourAction);
+
+                    colour = UtilRand() % kColourNumNormal;
+                    auto trackSetSupportColourAction = RideSetAppearanceAction(
+                        rideId, RideSetAppearanceType::TrackColourSupports, colour, colorpalet);
+                    GameActions::Execute(&trackSetSupportColourAction);
+
+
+
+
+
+
+
+
+                    break;
+                }
                 case WIDX_RANDOMISE_VEHICLE_COLOURS:
                 {
                     auto ride = GetRide(rideId);
@@ -4608,12 +4658,14 @@ namespace OpenRCT2::Ui::Windows
                 widgets[WIDX_TRACK_COLOUR_SCHEME].type = WindowWidgetType::DropdownMenu;
                 widgets[WIDX_TRACK_COLOUR_SCHEME_DROPDOWN].type = WindowWidgetType::Button;
                 widgets[WIDX_PAINT_INDIVIDUAL_AREA].type = WindowWidgetType::FlatBtn;
+                widgets[WIDX_RANDOMISE_TRACK_COLOURS].type = WindowWidgetType::Button;
             }
             else
             {
                 widgets[WIDX_TRACK_COLOUR_SCHEME].type = WindowWidgetType::Empty;
                 widgets[WIDX_TRACK_COLOUR_SCHEME_DROPDOWN].type = WindowWidgetType::Empty;
                 widgets[WIDX_PAINT_INDIVIDUAL_AREA].type = WindowWidgetType::Empty;
+                widgets[WIDX_RANDOMISE_TRACK_COLOURS].type = WindowWidgetType::Empty;
             }
 
             // Track main colour
@@ -4621,10 +4673,12 @@ namespace OpenRCT2::Ui::Windows
             {
                 widgets[WIDX_TRACK_MAIN_COLOUR].type = WindowWidgetType::ColourBtn;
                 widgets[WIDX_TRACK_MAIN_COLOUR].image = GetColourButtonImage(trackColour.main);
+                widgets[WIDX_RANDOMISE_TRACK_COLOURS].type = WindowWidgetType::Button;
             }
             else
             {
                 widgets[WIDX_TRACK_MAIN_COLOUR].type = WindowWidgetType::Empty;
+                widgets[WIDX_RANDOMISE_TRACK_COLOURS].type = WindowWidgetType::Empty;
             }
 
             // Track additional colour
@@ -4641,6 +4695,7 @@ namespace OpenRCT2::Ui::Windows
             // Selling item random colour checkbox
             if (ride->hasRecolourableShopItems())
             {
+                widgets[WIDX_RANDOMISE_TRACK_COLOURS].type = WindowWidgetType::Empty;
                 widgets[WIDX_SELL_ITEM_RANDOM_COLOUR_CHECKBOX].type = WindowWidgetType::Checkbox;
                 if (ride->hasLifecycleFlag(RIDE_LIFECYCLE_RANDOM_SHOP_COLOURS))
                 {
